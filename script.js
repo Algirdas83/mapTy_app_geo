@@ -66,7 +66,7 @@ inputDistance.addEventListener('keydown', function(e){
     e.preventDefault()
     if(e.key === 'Enter'){
         
-        console.log(e.target);
+        console.log('spust enter');
     }
     
 })
