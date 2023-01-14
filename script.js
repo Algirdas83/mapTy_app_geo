@@ -36,25 +36,37 @@ navigator.geolocation.getCurrentPosition(
                  map.on('click', function(mapEvent){
                    
                     form.classList.remove('hidden')
+                    inputDistance.focus()
+                    
                     
                     const {lat, lng} = mapEvent.latlng
                     
                     
-                    L.marker([lat, lng]).addTo(map)
-                    .bindPopup(L.popup({
-                        maxWidth: 200,
-                        minWidth: 100, 
-                        autoClose: false, 
-                        closeOnClick: false,
-                        className:'running-popup',
-                        content: 'treniruote'}))
-                    .openPopup();
+                    // L.marker([lat, lng]).addTo(map)
+                    // .bindPopup(L.popup({
+                    //     maxWidth: 200,
+                    //     minWidth: 100, 
+                    //     autoClose: false, 
+                    //     closeOnClick: false,
+                    //     className:'running-popup',
+                    //     content: 'treniruote'}))
+                    // .openPopup();
     
-                    console.log('Latitude: ', latitude, ' Longtitude: ', longitude );
+                    
                  })
 
         
 }, 
     function(){
     alert('Jusu dabartine vieta nepasiekiama')
+})
+
+
+inputDistance.addEventListener('keydown', function(e){
+    e.preventDefault()
+    if(e.key === 'Enter'){
+        
+        console.log(e.target);
+    }
+    
 })
