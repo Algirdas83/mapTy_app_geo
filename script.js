@@ -14,59 +14,81 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 
 
-if(navigator.geolocation)
-navigator.geolocation.getCurrentPosition(
-    function(position){ 
-        console.log(position.coords);
-        const {latitude, longitude} = position.coords
+class App{
 
-        const coords = [latitude, longitude]
+    #map;
+    #mapEvent;
 
-        const map = L.map('map').setView(coords, 14);
-        
+    constructor(){
+        this._getPosition()
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            L.marker(coords).addTo(map)
-                .bindPopup('Jūsų esate čia')
-                .openPopup();
-
-                 map.on('click', function(mapEvent){
-                   
-                    form.classList.remove('hidden')
-                    inputDistance.focus()
-                    
-                    
-                    const {lat, lng} = mapEvent.latlng
-                    
-                    
-                    // L.marker([lat, lng]).addTo(map)
-                    // .bindPopup(L.popup({
-                    //     maxWidth: 200,
-                    //     minWidth: 100, 
-                    //     autoClose: false, 
-                    //     closeOnClick: false,
-                    //     className:'running-popup',
-                    //     content: 'treniruote'}))
-                    // .openPopup();
-    
-                    
-                 })
-
-        
-}, 
-    function(){
-    alert('Jusu dabartine vieta nepasiekiama')
-})
-
-
-inputDistance.addEventListener('keydown', function(e){
-    e.preventDefault()
-    if(e.key === 'Enter'){
-        
-        console.log('spust enter');
+        inputType.addEventListener('change',this._toggelElevationField )
+        form.addEventListener('submit', this._newWorkout.bind(this))
+           
     }
+
+
+
+
+    //Methods
+    _getPosition(){
+        if(navigator.geolocation)
+        navigator.geolocation.getCurrentPosition( this._loadMap.bind(this) ,function(){
+            alert('Jusu dabartine vieta nepasiekiama')} ) 
+    }
+
+    _loadMap(position){
+        
+            const {latitude, longitude} = position.coords
+            const coords = [latitude, longitude]
     
-})
+             this.#map = L.map('map').setView(coords, 14);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.#map);
+              
+                 // Event (on) for handling clicks on map
+                 this.#map.on('click', this._showForm.bind(this) )
+                
+    }
+
+    _showForm(mapE){
+        this.#mapEvent = mapE
+        form.classList.remove('hidden')
+        inputDistance.focus()  
+    }
+
+    _toggelElevationField(){
+       
+         inputElevation.closest('.form__row').classList.toggle('form__row--hidden')
+         inputCadence.closest('.form__row').classList.toggle('form__row--hidden')
+    
+    }
+
+    _newWorkout(e){
+        // console.log('newWorkout',this);
+        e.preventDefault()
+        inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = ''
+        //Display marker
+        const {lat, lng} =this.#mapEvent.latlng
+                                
+        L.marker([lat, lng])
+        .addTo(this.#map)
+        .bindPopup(
+            L.popup({
+            maxWidth: 200,
+            minWidth: 100, 
+            autoClose: false, 
+            closeOnClick: false,
+            className:'running-popup',
+            }))
+            .setPopupContent('treniruote')
+        .openPopup();
+    }
+}
+
+
+ const app = new App()
+
+
+
