@@ -12,6 +12,46 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 
+class Workout {
+    
+    date = new Date()
+    id = (new Date() + '').slice(-10)
+    
+    constructor(coords ,distance, duration)
+    {
+
+        //this.date = ...
+        //this.id = ...
+        this.coords = coords
+        this.distance = distance //km
+        this.duration = duration //min
+        
+    }
+ }
+
+
+ class Running extends Workout{
+    #name
+
+    constructor(cadance, pace){
+        super(distance, duration.coords)
+        this.cadance = cadance
+        this.pace = pace
+
+    }
+ }
+
+
+ class Cysling extends Workout {
+
+    constructor(elevationGain, speed){
+        super(distance, duration, coords)
+        this.elevationGain = elevationGain
+        this.speed = speed
+
+    }
+ }
+
 
 
 class App{
@@ -91,4 +131,4 @@ class App{
  const app = new App()
 
 
-
+ 
