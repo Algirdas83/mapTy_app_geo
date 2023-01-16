@@ -11,6 +11,9 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+
+
+
 /////////////////// Classes
 class Workout {
     
@@ -32,8 +35,8 @@ class Workout {
 
  class Running extends Workout{
    
-
-    constructor(coords ,distance, duration, cadance){
+    type = 'running'
+    constructor(coords ,distance, duration, cadance ){
         super(coords,distance, duration)
         this.cadance = cadance
         this.calcPace()
@@ -47,9 +50,9 @@ class Workout {
 
 
  class Cysling extends Workout {
-
+    type = 'cycling'
     constructor(coords ,distance, duration, elevationGain){
-        super(coords,distance, duration, )
+        super(coords,distance, duration)
         this.elevationGain = elevationGain
         this.calcSpeed()
 
@@ -66,21 +69,20 @@ class Workout {
 
 /////////////////////////////////
 //Application Architecture//////
-class App{
+class App {
 
     #map;
     #mapEvent;
+    #workouts = []
 
     constructor(){
+        
         this._getPosition()
 
         inputType.addEventListener('change',this._toggelElevationField )
         form.addEventListener('submit', this._newWorkout.bind(this))
            
     }
-
-
-
 
     //Methods
     _getPosition(){
@@ -118,13 +120,70 @@ class App{
     }
 
     _newWorkout(e){
-        // console.log('newWorkout',this);
+        //Hellper methods
+        const validInputs = (... inputs) => 
+        inputs.every(inp => Number.isFinite(inp))
+        const allPositive = (...inputs) => inputs.every(inp => inp > 0)
+        
+        //////////////////////
         e.preventDefault()
-        inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = ''
-        //Display marker
+        
+        
+        // Get data from the  form 
+
+        const type = inputType.value
+        const distance = +inputDistance.value
+        const duration = +inputDuration.value
+        
         const {lat, lng} =this.#mapEvent.latlng
-                                
-        L.marker([lat, lng])
+        let workout;
+
+        //If workout runnig , creat runnig object
+        if(type === 'running'){
+            const cadance = +inputCadence.value
+     
+            if(!validInputs(distance, duration, cadance) || !allPositive(distance, duration, cadance) )
+            return alert('Inputs have to bee positive numbers')
+            //coords ,distance, duration, cadance
+             workout = new Running([lat, lng],distance, duration, cadance  )
+          
+        }
+
+        //If workout cycling , creat cycling object
+        if(type === 'cycling'){
+            const elevation = +inputElevation.value
+            
+            if(!validInputs(distance, duration, elevation) ||  !allPositive(distance, duration))
+            return alert('Inputs have to bee positive numbers')
+
+            workout = new Cysling([lat, lng],distance, duration, elevation  )
+        }
+
+        // Add new object to workout array
+        this.#workouts.push(workout)
+        console.log(workout);
+        // Render workout on map as marker
+
+        
+
+        //Display marker
+      
+         this.renderWorkoutMarker(workout)                       
+       
+
+        //render new workout on the list
+
+
+        //Hide the from and clear the input fields
+        inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = ''
+      
+    }
+
+    renderWorkoutMarker (workout){
+
+        
+        
+        L.marker(workout.coords)
         .addTo(this.#map)
         .bindPopup(
             L.popup({
@@ -132,9 +191,9 @@ class App{
             minWidth: 100, 
             autoClose: false, 
             closeOnClick: false,
-            className:'running-popup',
+            className: `${workout.type}-popup`,
             }))
-            .setPopupContent('treniruote')
+            .setPopupContent('workout.distance')
         .openPopup();
     }
 }
