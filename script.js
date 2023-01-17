@@ -94,8 +94,14 @@ class App {
 
     constructor(){
         
+
+        // user position
         this._getPosition()
 
+        //Get data from local storage
+        this._getLocalStorage()
+
+        // Attach event handlers
         inputType.addEventListener('change',this._toggelElevationField )
         form.addEventListener('submit', this._newWorkout.bind(this))
         containerWorkouts.addEventListener('click', this._moveToPopup.bind(this))
@@ -121,6 +127,10 @@ class App {
               
                  // Event (on) for handling clicks on map
                  this.#map.on('click', this._showForm.bind(this) )
+
+                 this.#workouts.forEach(work => {
+                    this._renderWorkoutMarker(work)
+                 })
                 
     }
 
@@ -195,6 +205,9 @@ class App {
 
         //Hide the from and clear the input fields
         this._hideForm()
+
+        //Set local storage to workouts
+        this._setLocalStorage()
       
     }
 
@@ -271,9 +284,31 @@ class App {
       if(!workoutEl)return
       const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id )
       this.#map.setView(workout.coords, this.#mapZoomLevel, {animate: true, duration: 1})
-      //using the publick interface
+      
+      this.removeWorkouts(e)
+    }
+
+    _setLocalStorage(){
+
+        localStorage.setItem('workouts', JSON.stringify(this.#workouts))
+    }
+
+    _getLocalStorage(){
+         const data = JSON.parse(localStorage.getItem('workouts')) 
+         
+         if(!data) return
         
-      workout.click()
+         this.#workouts = data
+
+         this.#workouts.forEach(work => {
+            this. _renderWorkout(work)
+            
+         })
+    }
+
+    reset(){
+        localStorage.removeItem('workouts')
+        location.reload()
     }
 }
 
