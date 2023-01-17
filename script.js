@@ -305,7 +305,7 @@ class App {
             
          })
     }
-
+// publick
     reset(){
         localStorage.removeItem('workouts')
         location.reload()
